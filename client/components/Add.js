@@ -1,61 +1,20 @@
-import { useReducer } from 'react';
 import { Box, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { useUserDispatch } from './UserContext';
+import { useWishlist, useWishlistDispatch } from './WishlistContext';
 
-const initialState = {
-  title: '',
-  description: '',
-  image: '',
-  loading: false,
-};
+export default function Add({ token }) {
+  const { add } = useWishlist();
+  const { addContent, updateAddForm, validateAddedContent } =
+    useWishlistDispatch();
 
-const addCardReducer = (state, action) => {
-  switch (action.type) {
-    case 'update': {
-      return {
-        ...state,
-        [action.target]: action.value,
-      };
-    }
-    case 'reset': {
-      return {
-        ...initialState,
-        loading: false,
-      };
-    }
-    case 'loading': {
-      return {
-        ...state,
-        loading: action.loading,
-      };
-    }
-  }
-};
-
-export default function Add({ token, pageDispatch }) {
-  const { addContent } = useUserDispatch();
-  const [addCardData, addCardDispatch] = useReducer(
-    addCardReducer,
-    initialState
-  );
   const handleSubmit = async () => {
-    addCardDispatch({ type: 'loading', loading: true });
-    try {
-      await addContent({
-        jwt: token,
-        title: addCardData.title,
-        description: addCardData.description,
-        image: addCardData.image,
-      });
-      addCardDispatch({ type: 'loading', loading: false });
-      addCardDispatch({ type: 'reset' });
-      pageDispatch({ type: 'message', text: 'Card Added!' });
-    } catch (err) {
-      addCardDispatch({ type: 'loading', loading: false });
-      pageDispatch({ type: 'message', text: 'Error Adding card.' });
-      console.log(`Error adding card: ${err}`);
-    }
+    if (!validateAddedContent(add.title, add.description, add.image)) return;
+    addContent({
+      jwt: token,
+      title: add.title,
+      description: add.description,
+      image: add.image,
+    });
   };
   return (
     <Box
@@ -72,45 +31,27 @@ export default function Add({ token, pageDispatch }) {
         label='Title'
         name='title'
         placeholder='Enter product title'
-        value={addCardData.title}
-        onChange={(e) => {
-          addCardDispatch({
-            type: 'update',
-            target: 'title',
-            value: e.target.value,
-          });
-        }}
+        value={add.title}
+        onChange={(e) => updateAddForm(e.target)}
       />
       <TextField
         label='Description'
         name='description'
         placeholder='Enter product description'
-        value={addCardData.description}
-        onChange={(e) => {
-          addCardDispatch({
-            type: 'update',
-            target: 'description',
-            value: e.target.value,
-          });
-        }}
+        value={add.description}
+        onChange={(e) => updateAddForm(e.target)}
       />
       <TextField
         label='Image'
         name='image'
         placeholder='Enter link to product image'
-        value={addCardData.image}
-        onChange={(e) => {
-          addCardDispatch({
-            type: 'update',
-            target: 'image',
-            value: e.target.value,
-          });
-        }}
+        value={add.image}
+        onChange={(e) => updateAddForm(e.target)}
       />
       <LoadingButton
         variant='contained'
         onClick={handleSubmit}
-        loading={addCardData.loading}
+        loading={add.loading}
       >
         Submit
       </LoadingButton>

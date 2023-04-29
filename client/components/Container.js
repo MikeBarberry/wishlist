@@ -1,6 +1,6 @@
-import { UserContextProvider } from './UserContext';
+import { WishlistContextProvider, Login, Register, Page } from '.';
 import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
-import App from './App';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 const theme = createTheme({
   typography: {
@@ -8,13 +8,28 @@ const theme = createTheme({
   },
 });
 
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Login />,
+  },
+  {
+    path: '/register',
+    element: <Register />,
+  },
+  {
+    path: '/content',
+    element: <Page />,
+  },
+]);
+
 export default function Container() {
   return (
-    <UserContextProvider>
+    <WishlistContextProvider>
       <CssBaseline />
       <ThemeProvider theme={theme}>
-        <App />
+        <RouterProvider router={router} />;
       </ThemeProvider>
-    </UserContextProvider>
+    </WishlistContextProvider>
   );
 }

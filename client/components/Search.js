@@ -1,15 +1,15 @@
 import React from 'react';
 import { TextField } from '@mui/material';
+import { useWishlistDispatch } from '.';
 
-export default function SearchBar({ pageDispatch }) {
+export default function SearchBar() {
+  const { updateSearchQuery } = useWishlistDispatch();
   return (
     <TextField
       id='standard-basic'
       label='Search'
       variant='standard'
-      onChange={(e) => {
-        pageDispatch({ type: 'search', value: e.target.value });
-      }}
+      onChange={(e) => updateSearchQuery(e.target.value)}
     />
   );
 }

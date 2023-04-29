@@ -1,36 +1,39 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { Box, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { resetErrors, useFormData } from '.';
+import { useWishlist } from '.';
 import { postReq } from '../utils';
 
 export default function Register() {
-  const [form, dispatch] = useFormData();
   const navigate = useNavigate();
+  const { useForm } = useWishlist();
+  const {
+    form,
+    resetErrors,
+    toggleLoading,
+    serverError,
+    passwordMatchError,
+    changeUsernameField,
+    changePasswordField,
+  } = useForm();
 
   const handleSubmit = async () => {
-    resetErrors(dispatch);
-    console.log(form);
+    resetErrors();
     if (form.password1 !== form.password2) {
-      dispatch({
-        type: 'error',
-        serverError: false,
-        error: `Passwords don't match`,
-      });
+      passwordMatchError();
       return;
     }
-    dispatch({ type: 'loading' });
+    toggleLoading();
     const res = await postReq('/register', {
       username: form.username,
       password: form.password1,
     });
     const json = await res.json();
-    dispatch({ type: 'loading' });
+    toggleLoading();
     if (res.status === 200) {
-      console.log('status 200');
       navigate('/');
     }
-    dispatch({ type: 'error', serverError: true, error: json.error });
+    serverError(true, json.error);
   };
 
   return (
@@ -86,9 +89,7 @@ export default function Register() {
             name='username'
             placeholder='Enter your username'
             value={form.username}
-            onChange={(e) => {
-              dispatch({ type: 'username', username: e.target.value });
-            }}
+            onChange={(e) => changeUsernameField(e.target.value)}
           />
           <TextField
             sx={{
@@ -100,13 +101,7 @@ export default function Register() {
             name='password'
             placeholder='Enter your password'
             value={form.password1}
-            onChange={(e) => {
-              dispatch({
-                type: 'password',
-                password1: true,
-                password: e.target.value,
-              });
-            }}
+            onChange={(e) => changePasswordField(true, e.target.value)}
           />
           <TextField
             sx={{
@@ -120,13 +115,7 @@ export default function Register() {
             name='password2'
             placeholder='Enter your password again'
             value={form.password2}
-            onChange={(e) => {
-              dispatch({
-                type: 'password',
-                password1: false,
-                password: e.target.value,
-              });
-            }}
+            onChange={(e) => changePasswordField(false, e.target.value)}
           />
           <LoadingButton
             onClick={handleSubmit}

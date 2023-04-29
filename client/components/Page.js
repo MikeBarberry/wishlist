@@ -1,53 +1,20 @@
-import { useEffect, useMemo, useReducer } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Snackbar, Alert } from '@mui/material';
+import { Box, Button, Snackbar, Alert, CircularProgress } from '@mui/material';
 import { ExitToApp } from '@mui/icons-material';
-import { useUserData, useUserDispatch, Search, Card, Add } from '.';
-
-const initialState = {
-  search: '',
-  numCards: 8,
-  message: {
-    visible: false,
-    text: '',
-  },
-};
-
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'add_cards': {
-      return {
-        ...state,
-        numCards: state.numCards + 4,
-      };
-    }
-    case 'message': {
-      return {
-        ...state,
-        message: {
-          visible: !!action.text,
-          text: action.text,
-        },
-      };
-    }
-    case 'search': {
-      return {
-        ...state,
-        search: action.value,
-      };
-    }
-  }
-};
+import { useWishlist, useWishlistDispatch, Search, Card, Add } from '.';
 
 export default function UserPage() {
-  const user = useUserData();
-  const { logoutUser } = useUserDispatch();
-  const [pageData, pageDispatch] = useReducer(reducer, initialState);
-  const navigate = useNavigate();
   const token = localStorage.getItem('jwt');
+  const navigate = useNavigate();
+  const { user, page } = useWishlist();
+  const { logoutUser, increaseCardCount, updatePageMessage, getUserContent } =
+    useWishlistDispatch();
 
   useEffect(() => {
-    if (!user.isAuthenticated) {
+    if (token) {
+      getUserContent(token);
+    } else {
       navigate('/');
     }
   }, [user.isAuthenticated]);
@@ -63,15 +30,11 @@ export default function UserPage() {
   };
 
   const visibleCards = useMemo(
-    () => filterCards(user.content, pageData.search, pageData.numCards),
-    [user.content, pageData.search, pageData.numCards]
+    () => filterCards(user.content, page.search, page.numCards),
+    [user.content, page.search, page.numCards]
   );
 
-  const pageContext = {
-    pageData: pageData,
-    pageDispatch: pageDispatch,
-    token: token,
-  };
+  const tokenProp = { token };
 
   return (
     <Box
@@ -105,11 +68,17 @@ export default function UserPage() {
             paddingBottom: '25px',
           }}
         >
-          <Button variant='outlined' onClick={logoutUser}>
+          <Button
+            variant='outlined'
+            onClick={() => {
+              logoutUser();
+              navigate('/');
+            }}
+          >
             Logout <ExitToApp />
           </Button>
         </Box>
-        <Add {...pageContext} />
+        <Add {...tokenProp} />
         <Box
           sx={{
             gridColumnStart: 4,
@@ -119,7 +88,7 @@ export default function UserPage() {
             paddingBottom: '25px',
           }}
         >
-          <Search {...pageContext} />
+          <Search />
         </Box>
       </Box>
       <Box
@@ -132,34 +101,36 @@ export default function UserPage() {
           paddingLeft: '20px',
         }}
       >
-        {visibleCards.map((card) => {
-          return <Card key={card.title} card={card} {...pageContext} />;
-        })}
+        {page.loading ? (
+          <Box sx={{ position: 'absolute', top: '50%', right: '50%' }}>
+            <CircularProgress color='inherit' />
+          </Box>
+        ) : (
+          visibleCards.map((card) => {
+            return <Card key={card.title} card={card} {...tokenProp} />;
+          })
+        )}
       </Box>
       <Box sx={{ position: 'relative' }}>
         <Box sx={{ position: 'absolute', right: '7%' }}>
           <Button
-            onClick={() => {
-              pageDispatch({ type: 'add_cards' });
-            }}
+            onClick={increaseCardCount}
             variant='contained'
             sx={{ marginBottom: '5px' }}
-            disabled={user.content.length <= pageData.numCards}
+            disabled={user.content.length <= page.numCards}
           >
             Show Next Row
           </Button>
         </Box>
       </Box>
       <Snackbar
-        open={pageData.message.visible}
-        onClose={() => {
-          pageDispatch({ type: 'message', text: '' });
-        }}
+        open={page.message.visible}
+        onClose={() => updatePageMessage('')}
         autoHideDuration={4000}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert severity='success' sx={{ width: '100%' }}>
-          {pageData.message.text}
+        <Alert severity={page.message.severity} sx={{ width: '100%' }}>
+          {page.message.text}
         </Alert>
       </Snackbar>
     </Box>

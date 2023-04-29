@@ -13,18 +13,25 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Delete } from '@mui/icons-material';
-import { useUserDispatch } from '.';
+import { useWishlistDispatch } from '.';
 
-export default function ContentCard({ token, card, pageDispatch }) {
+export default function ContentCard({ token, card }) {
+  const { deleteContent, updatePageMessage } = useWishlistDispatch();
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { deleteContent } = useUserDispatch();
+
   const handleDelete = async () => {
     setOpen(false);
     setLoading(true);
-    await deleteContent({ jwt: token, title: card.title });
+    try {
+      await deleteContent({ jwt: token, title: card.title });
+      updatePageMessage('Card Deleted.');
+    } catch (err) {
+      updatePageMessage('Error Deleting Card.', 'error');
+      console.log(`An error occurred deleting a card: ${err}`);
+    }
     setLoading(false);
-    pageDispatch({ type: 'message', text: 'Card Deleted.' });
   };
 
   return (

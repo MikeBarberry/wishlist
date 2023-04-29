@@ -47,11 +47,7 @@ const reducer = (state, action) => {
   }
 };
 
-export const resetErrors = (dispatch) => {
-  dispatch({ type: 'reset_errors' });
-};
-
-export function useFormData() {
+export default function useAuthForm() {
   const [state, dispatch] = useReducer(reducer, initialState);
   return [state, dispatch];
 }
