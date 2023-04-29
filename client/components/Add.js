@@ -1,6 +1,6 @@
 import { Box, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { useWishlist, useWishlistDispatch } from './WishlistContext';
+import { useWishlist, useWishlistDispatch } from './context/WishlistContext';
 
 export default function Add({ token }) {
   const { add } = useWishlist();

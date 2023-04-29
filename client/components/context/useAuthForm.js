@@ -48,6 +48,5 @@ const reducer = (state, action) => {
 };
 
 export default function useAuthForm() {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  return [state, dispatch];
+  return useReducer(reducer, initialState);
 }
