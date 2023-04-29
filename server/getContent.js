@@ -24,9 +24,7 @@ exports.handler = async (event) => {
           headers: {
             'access-control-allow-origin': '*',
           },
-          body: JSON.stringify({
-            content,
-          }),
+          body: JSON.stringify(content),
         };
       },
       500(err) {
