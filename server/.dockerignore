@@ -1,0 +1,6 @@
+node_modules
+.aws-sam
+Dockerfile
+.dockerignore
+.cache
+build

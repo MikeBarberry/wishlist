@@ -1,5 +1,4 @@
-const API_ROUTE =
-  'https://pshgvjl5aa.execute-api.us-west-2.amazonaws.com/production/api';
+const API_ROUTE = 'https://api.wishlists.link';
 
 const createPostOptions = (body) => {
   return {

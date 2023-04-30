@@ -4,3 +4,7 @@ temp.js
 dist/
 .DS_Store\
 .parcel-cache/
+**samconfig.toml
+**env.json
+.aws-sam/
+test/

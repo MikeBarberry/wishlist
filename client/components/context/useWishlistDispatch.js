@@ -28,10 +28,10 @@ export default function useWishlistDispatch() {
     try {
       const response = await postReq('/getcontent', { jwt: token });
       const json = await response.json();
-      const { content } = json;
+      const { userContent } = json;
       dispatch({
         type: 'set_content',
-        content: content,
+        content: userContent,
       });
     } catch (err) {
       updatePageMessage('A server error occurred', 'error');

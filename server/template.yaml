@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: 'Wishlists Back End'
+
+
+Globals:
+  Function:
+    Timeout: 15
+    MemorySize: 128
+
+Parameters:
+  CertificateARN:
+    Type: String
+  HostedZoneID:
+    Type: String
+  ImageURI:
+    Type: String
+  MongoURI:
+    Type: String
+  JWTSecret:  
+    Type: String
+
+Resources:
+  WishlistsAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Description: 'Wishlists Back End'
+      StageName: main
+      EndpointConfiguration: REGIONAL
+      BinaryMediaTypes:
+        - '*'
+      Domain:
+        DomainName: api.wishlists.link
+        CertificateArn:
+          Ref: CertificateARN
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId:
+            Ref: HostedZoneID
+
+  WishlistsBackendLambda:
+    Type: AWS::Serverless::Function
+    Metadata:
+      DockerTag: nodejs18.x-v1
+      DockerContext: .
+      Dockerfile: Dockerfile
+    Properties:
+      FunctionName: Wishlists-Proxy-Plus
+      Environment:
+        Variables:
+          NODE_ENV: production
+          MONGO_URI:
+            Ref: MongoURI
+          JWT_SECRET:
+            Ref: JWTSecret
+      PackageType: Image
+      Architectures:
+        - x86_64
+      ImageUri:
+        Ref: ImageURI
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: WishlistsAPI
+            Path: /
+            Method: ANY
+        ProxyPlus:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: WishlistsAPI
+            Path: /{proxy+}
+            Method: ANY
+
+Outputs:
+  WishlistsBackend:
+    Description: 'API root URL'
+    Value: 'https://api.wishlists.link/'
