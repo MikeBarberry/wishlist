@@ -5,6 +5,13 @@
   "engines": {
     "node": "^18"
   },
+  "targets": {
+    "default": {
+      "engines": {
+        "browsers": ">= 50%"
+      }
+    }
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -13,7 +20,7 @@
   },
   "scripts": {
     "dev": "parcel public/index.html",
-    "build": "parcel build"
+    "build": "parcel build public/index.html"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
