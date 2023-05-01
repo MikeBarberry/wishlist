@@ -1,16 +1,20 @@
 {
+  "version": "2.0",
   "private": true,
   "author": "Mike Barberry",
+  "main": "lambda.mjs",
+  "engines": {
+    "node": "^18"
+  },
   "scripts": {
-    "full-build": "npm run docker:login && cfn-lint template.yaml && npm run docker:build && npm run docker:push && npm run sam:build && npm run sam:deploy",
+    "fullbuild": "npm run docker:login && cfn-lint template.yaml && npm run docker:build && npm run docker:push && npm run sam:build && npm run sam:deploy",
     "docker:login": "aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $WISHLISTS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com",
-    "docker:build": "docker build -t $WISHLISTS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/wishlists .",
-    "docker:push": "docker push $WISHLISTS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/wishlists",
+    "docker:build": "docker build -t $WISHLISTS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/wishlists:latest .",
+    "docker:push": "docker push $WISHLISTS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/wishlists:latest",
     "sam:build": "sam build",
     "sam:deploy": "sam deploy"
   },
   "dependencies": {
-    "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.0",
     "mongodb": "^5.3.0"

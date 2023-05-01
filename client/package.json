@@ -1,6 +1,7 @@
 {
+  "version": "2.0",
   "name": "wishlist-client",
-  "version": "0.1.0",
+  "author": "Mike Barberry",
   "private": true,
   "engines": {
     "node": "^18"

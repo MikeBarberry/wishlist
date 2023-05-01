@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { getSeedContent } from './utils.mjs';
+import { getSeedContent } from '../index.mjs';
 
 export default async function handleRegister(body, responseValues, collection) {
   const username = body.username.toLowerCase();

@@ -2,7 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: 'Wishlists Back End'
 
-
 Globals:
   Function:
     Timeout: 15
@@ -24,6 +23,7 @@ Resources:
   WishlistsAPI:
     Type: AWS::Serverless::Api
     Properties:
+      Name: Wishlists-Proxy-Plus
       Description: 'Wishlists Back End'
       StageName: main
       EndpointConfiguration: REGIONAL
