@@ -47,6 +47,42 @@ const reducer = (state, action) => {
   }
 };
 
-export default function useAuthForm() {
-  return useReducer(reducer, initialState);
+export default function useForm() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const resetErrors = () => {
+    dispatch({ type: 'reset_errors' });
+  };
+  const toggleLoading = () => {
+    dispatch({ type: 'loading' });
+  };
+  const serverError = (server, error) => {
+    dispatch({ type: 'error', serverError: server, error });
+  };
+  const passwordMatchError = () => {
+    dispatch({
+      type: 'error',
+      serverError: false,
+      error: `Passwords don't match`,
+    });
+  };
+  const changeUsernameField = (value) => {
+    dispatch({ type: 'username', username: value });
+  };
+  const changePasswordField = (field1, value) => {
+    dispatch({
+      type: 'password',
+      password1: field1,
+      password: value,
+    });
+  };
+  return {
+    form: state,
+    resetErrors,
+    toggleLoading,
+    serverError,
+    passwordMatchError,
+    changePasswordField,
+    changeUsernameField,
+  };
 }

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Box, TextField, Paper, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { useWishlist, useWishlistDispatch } from '.';
+import { useWishlist, useWishlistDispatch, useForm } from '.';
 import { postReq } from '../utils';
 
 import Blob from '../public/blob.png';
@@ -10,7 +10,8 @@ import Blob2 from '../public/blob2.png';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { user, useForm } = useWishlist();
+  const { user } = useWishlist();
+  const { setUser } = useWishlistDispatch();
   const {
     form,
     resetErrors,
@@ -19,7 +20,6 @@ export default function Login() {
     changeUsernameField,
     changePasswordField,
   } = useForm();
-  const { setUser } = useWishlistDispatch();
 
   useEffect(() => {
     if (user.isAuthenticated) {

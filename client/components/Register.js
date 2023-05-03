@@ -1,12 +1,11 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { Box, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { useWishlist } from '.';
+import { useForm } from '.';
 import { postReq } from '../utils';
 
 export default function Register() {
   const navigate = useNavigate();
-  const { useForm } = useWishlist();
   const {
     form,
     resetErrors,
