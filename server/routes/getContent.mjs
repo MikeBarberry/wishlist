@@ -1,18 +1,47 @@
+import { ObjectId } from 'mongodb';
 import jwt from 'jsonwebtoken';
 
-export default async function handleGetContent(
-  body,
-  responseValues,
-  collection
-) {
+export default async function handleGetContent({ body, response, collection }) {
   const token = body.jwt;
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const username = decoded.username;
-    const user = await collection.findOne({ username });
-    return responseValues[200]({ userContent: user.content });
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return response(400, { error: 'Invalid token signature' });
+    }
+    const mongoRes = await collection
+      .aggregate([
+        { $project: { cards: 1 } },
+        { $match: { _id: { $eq: new ObjectId(decoded.id) } } },
+        {
+          $lookup: {
+            from: 'cards',
+            let: { id: '$_id' },
+            pipeline: [
+              {
+                $match: { $expr: { $in: ['$$id', '$users'] } },
+              },
+              {
+                $project: {
+                  title: 1,
+                  description: 1,
+                  image: 1,
+                  id: {
+                    $toString: '$_id',
+                  },
+                },
+              },
+            ],
+            as: 'cards',
+          },
+        },
+      ])
+      .toArray();
+    const { cards } = mongoRes[0];
+    return response(200, cards);
   } catch (err) {
-    return responseValues[500](err);
+    return response(500, { error: err });
   }
 }

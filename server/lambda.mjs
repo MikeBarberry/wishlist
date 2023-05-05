@@ -1,5 +1,5 @@
-import { MongoClient } from 'mongodb';
 import process from 'node:process';
+import { MongoClient } from 'mongodb';
 import {
   handleAddContent,
   handleDeleteContent,
@@ -22,58 +22,38 @@ export const handler = async (event, context) => {
       },
     };
   } else if (event.httpMethod === 'POST') {
-    const responseValues = {
-      200(message) {
-        return {
-          statusCode: 200,
-          body: JSON.stringify(message),
-          headers: {
-            'access-control-allow-origin': '*',
-          },
-        };
-      },
-      400(err) {
-        return {
-          statusCode: 400,
-          headers: {
-            'access-control-allow-origin': '*',
-          },
-          body: JSON.stringify(err),
-        };
-      },
-      500(err) {
-        return {
-          statusCode: 500,
-          headers: {
-            'access-control-allow-origin': '*',
-          },
-          body: JSON.stringify({
-            errorType: 'Server',
-            error: `A server error occurred: ${err}`,
-          }),
-        };
-      },
-    };
+    function response(statusCode, body) {
+      return {
+        statusCode,
+        headers: {
+          'access-control-allow-origin': '*',
+        },
+        body: JSON.stringify(body),
+      };
+    }
 
     const database = client.db('wishlist');
-    const collection = database.collection('usercontent');
+    const userCol = database.collection('usercontent');
+    const cardsCol = database.collection('cards');
     const body = JSON.parse(event.body);
+
+    const args = { body, response, collection: userCol };
 
     switch (event.path) {
       case '/addcontent': {
-        return handleAddContent(body, responseValues, collection);
+        return handleAddContent({ ...args });
       }
       case '/getcontent': {
-        return handleGetContent(body, responseValues, collection);
+        return handleGetContent({ ...args });
       }
       case '/deletecontent': {
-        return handleDeleteContent(body, responseValues, collection);
+        return handleDeleteContent({ ...args });
       }
       case '/login': {
-        return handleLogin(body, responseValues, collection);
+        return handleLogin({ ...args });
       }
       case '/register': {
-        return handleRegister(body, responseValues, collection);
+        return handleRegister({ ...args, cardsCol });
       }
     }
   }

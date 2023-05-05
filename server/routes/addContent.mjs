@@ -1,11 +1,7 @@
 import { ObjectId } from 'mongodb';
 import jwt from 'jsonwebtoken';
 
-export default async function handleAddContent(
-  body,
-  responseValues,
-  collection
-) {
+export default async function handleAddContent({ body, response, collection }) {
   const token = body.jwt;
   const title = body.title;
   const description = body.description;
@@ -21,8 +17,11 @@ export default async function handleAddContent(
       { _id: new ObjectId(user._id) },
       { $set: { content: updatedContent } }
     );
-    return responseValues[200]({ updatedContent });
+    return response(200, { updatedContent });
   } catch (err) {
-    return responseValues[500](err);
+    return response(500, {
+      errorType: 'Server',
+      error: `A server error occurred: ${err}`,
+    });
   }
 }
