@@ -3,14 +3,14 @@ import bcrypt from 'bcryptjs';
 export default async function handleRegister({
   body,
   response,
-  collection,
+  userCol,
   cardsCol,
 }) {
   const username = body.username.toLowerCase();
   const { password } = body;
 
   try {
-    const user = await collection.findOne({ username });
+    const user = await userCol.findOne({ username });
     if (user) {
       return response(400, {
         errorType: 'User',
@@ -18,7 +18,7 @@ export default async function handleRegister({
       });
     }
     const hash = await bcrypt.hash(password, 10);
-    const newUser = await collection.insertOne({
+    const newUser = await userCol.insertOne({
       username,
       hash,
     });

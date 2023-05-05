@@ -1,4 +1,3 @@
-import process from 'node:process';
 import { MongoClient } from 'mongodb';
 import {
   handleAddContent,
@@ -10,7 +9,7 @@ import {
 
 const client = new MongoClient(process.env.MONGO_URI);
 
-export const handler = async (event, context) => {
+export const handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -37,24 +36,25 @@ export const handler = async (event, context) => {
     const cardsCol = database.collection('cards');
     const body = JSON.parse(event.body);
 
-    const args = { body, response, collection: userCol };
+    const args = { body, response };
 
     switch (event.path) {
       case '/addcontent': {
-        return handleAddContent({ ...args });
+        return handleAddContent({ ...args, cardsCol });
       }
       case '/getcontent': {
-        return handleGetContent({ ...args });
+        return handleGetContent({ ...args, userCol });
       }
       case '/deletecontent': {
-        return handleDeleteContent({ ...args });
+        return handleDeleteContent({ ...args, cardsCol });
       }
       case '/login': {
-        return handleLogin({ ...args });
+        return handleLogin({ ...args, userCol });
       }
       case '/register': {
-        return handleRegister({ ...args, cardsCol });
+        return handleRegister({ ...args, userCol, cardsCol });
       }
     }
   }
+  q;
 };

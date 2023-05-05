@@ -26,11 +26,11 @@ export default function useWishlistDispatch() {
   const getUserContent = async (token) => {
     togglePageLoading(true);
     try {
-      const res = await postReq('/getcontent', { jwt: token });
+      const res = await postReq('/getcontent', { token });
       const json = await res.json();
       dispatch({
-        type: 'set_content',
-        content: json,
+        type: 'set_cards',
+        cards: json,
       });
     } catch (err) {
       updatePageMessage('A server error occurred', 'error');
@@ -40,14 +40,14 @@ export default function useWishlistDispatch() {
   };
 
   const addContent = async (body) => {
+    const { token, ...rest } = body;
     toggleAddFormLoading(true);
     try {
       const res = await postReq('/addcontent', body);
       const json = await res.json();
-      const { updatedContent } = json;
       dispatch({
-        type: 'set_content',
-        content: updatedContent,
+        type: 'add_card',
+        card: { ...rest, id: json.id },
       });
       resetAddForm();
       updatePageMessage('Card Added!');
@@ -59,12 +59,10 @@ export default function useWishlistDispatch() {
   };
 
   const deleteContent = async (body) => {
-    const res = await postReq('/deletecontent', body);
-    const json = await res.json();
-    const { updatedContent } = json;
+    await postReq('/deletecontent', body);
     dispatch({
-      type: 'set_content',
-      content: updatedContent,
+      type: 'remove_card',
+      id: body.id,
     });
   };
 

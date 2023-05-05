@@ -38,12 +38,30 @@ const reducer = (state, action) => {
         },
       };
     }
-    case 'set_content': {
+    case 'set_cards': {
       return {
         ...state,
         user: {
           ...state.user,
-          content: action.content,
+          content: action.cards,
+        },
+      };
+    }
+    case 'remove_card': {
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          content: state.user.content.filter((ele) => ele.id !== action.id),
+        },
+      };
+    }
+    case 'add_card': {
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          content: [...state.user.content, { ...action.card }],
         },
       };
     }

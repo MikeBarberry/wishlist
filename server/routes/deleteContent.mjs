@@ -4,24 +4,48 @@ import jwt from 'jsonwebtoken';
 export default async function handleDeleteContent({
   body,
   response,
-  collection,
+  cardsCol,
 }) {
-  const token = body.jwt;
-  const title = body.title;
+  const { token, id: cardId } = body;
+  const cardObjId = new ObjectId(cardId);
+  const cardIdFilter = { _id: cardObjId };
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const username = decoded.username;
-    const user = await collection.findOne({ username });
-    const { content } = user;
-    const updatedContent = content.filter(
-      (item) => item.title.toLowerCase() !== title.toLowerCase()
-    );
-    await collection.updateOne(
-      { _id: new ObjectId(user._id) },
-      { $set: { content: updatedContent } }
-    );
-    return response(200, { updatedContent });
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return response(400, { error: 'Invalid token signature' });
+    }
+    const userObjId = new ObjectId(decoded.id);
+    /**
+     * @description Find the number of users
+     * subscribed to the card being requested
+     * for deletion
+     */
+    const cardCountUsers = await cardsCol
+      .aggregate([
+        {
+          $match: { _id: { $eq: cardObjId } },
+        },
+        {
+          $project: {
+            usersLength: { $size: '$users' },
+          },
+        },
+      ])
+      .toArray();
+    const { usersLength } = cardCountUsers[0];
+    if (usersLength === 1) {
+      await cardsCol.deleteOne(cardIdFilter);
+    } else {
+      /**
+       * @description Remove the user
+       * from the card's users array
+       */
+      await cardsCol.updateOne(cardIdFilter, { $pull: { users: userObjId } });
+    }
+    return response(200, { message: 'Successfully deleted card.' });
   } catch (err) {
     return response(500, {
       errorType: 'Server',

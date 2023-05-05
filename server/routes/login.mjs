@@ -1,11 +1,11 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-export default async function handleLogin({ body, response, collection }) {
+export default async function handleLogin({ body, response, userCol }) {
   try {
     const username = body.username.toLowerCase();
     const { password } = body;
-    const user = await collection.findOne({ username });
+    const user = await userCol.findOne({ username });
     if (!user) {
       return response(400, {
         errorType: 'User',
@@ -20,7 +20,7 @@ export default async function handleLogin({ body, response, collection }) {
       });
     }
     const token = jwt.sign({ username, id: user._id }, process.env.JWT_SECRET);
-    return response(200, { message: 'Logged in.', jwt: token });
+    return response(200, { message: 'Logged in.', token });
   } catch (err) {
     console.log(`Server error: ${err}`);
     return response(500, {

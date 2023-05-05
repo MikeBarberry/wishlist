@@ -41,7 +41,7 @@ export default function Login() {
     } else if (res.status === 400) {
       serverError(false, json.error);
     } else {
-      setUser(json.jwt);
+      setUser(json.token);
     }
   };
 

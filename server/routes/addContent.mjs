@@ -1,23 +1,25 @@
 import { ObjectId } from 'mongodb';
 import jwt from 'jsonwebtoken';
 
-export default async function handleAddContent({ body, response, collection }) {
-  const token = body.jwt;
-  const title = body.title;
-  const description = body.description;
-  const image = body.image;
+export default async function handleAddContent({ body, response, cardsCol }) {
+  const { token, title, description, image } = body;
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const username = decoded.username;
-    const user = await collection.findOne({ username });
-    const content = user.content;
-    const updatedContent = [...content, { title, description, image }];
-    await collection.updateOne(
-      { _id: new ObjectId(user._id) },
-      { $set: { content: updatedContent } }
-    );
-    return response(200, { updatedContent });
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return response(400, { error: 'Invalid token signature' });
+    }
+    const userId = new ObjectId(decoded.id);
+    const newCard = {
+      title,
+      description,
+      image,
+      users: [userId],
+    };
+    await cardsCol.insertOne(newCard);
+    return response(200, { id: newCard.insertedId });
   } catch (err) {
     return response(500, {
       errorType: 'Server',

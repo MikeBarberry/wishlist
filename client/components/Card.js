@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   Box,
-  Card,
+  Card as MUICard,
   CardActions,
   CardContent,
   CardMedia,
@@ -15,7 +15,8 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { Delete } from '@mui/icons-material';
 import { useWishlistDispatch } from '.';
 
-export default function ContentCard({ token, card }) {
+export default function Card({ token, card }) {
+  const { id, title, image, description } = card;
   const { deleteContent, updatePageMessage } = useWishlistDispatch();
 
   const [open, setOpen] = useState(false);
@@ -25,7 +26,7 @@ export default function ContentCard({ token, card }) {
     setOpen(false);
     setLoading(true);
     try {
-      await deleteContent({ jwt: token, title: card.title });
+      await deleteContent({ token, id });
       updatePageMessage('Card Deleted.');
     } catch (err) {
       updatePageMessage('Error Deleting Card.', 'error');
@@ -46,22 +47,22 @@ export default function ContentCard({ token, card }) {
         padding: '20px',
       }}
     >
-      <Card>
+      <MUICard>
         <CardMedia
           component='img'
           height='140'
           width='260'
-          src={card.image}
+          src={image}
           alt='coral_image'
         />
         <CardContent sx={{ justifySelf: 'center' }}>
           <Box>
             <Typography variant='h5' gutterBottom>
-              {card.title}
+              {title}
             </Typography>
           </Box>
           <Typography variant='body2' color='text.secondary'>
-            {card.description}
+            {description}
           </Typography>
         </CardContent>
         <CardActions sx={{ justifyContent: 'center' }}>
@@ -90,7 +91,7 @@ export default function ContentCard({ token, card }) {
             </DialogActions>
           </Dialog>
         </CardActions>
-      </Card>
+      </MUICard>
     </Box>
   );
 }

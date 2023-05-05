@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: 'Wishlists Back End'
 
@@ -12,11 +12,13 @@ Parameters:
     Type: String
   HostedZoneID:
     Type: String
-  ImageURI:
+  ImageRepo:
     Type: String
   MongoURI:
     Type: String
-  JWTSecret:  
+  JWTSecret:
+    Type: String
+  BuildID:
     Type: String
 
 Resources:
@@ -57,7 +59,7 @@ Resources:
       Architectures:
         - x86_64
       ImageUri:
-        Ref: ImageURI
+        Fn::Sub: ${ImageRepo}:${BuildID}
       Events:
         Root:
           Type: Api

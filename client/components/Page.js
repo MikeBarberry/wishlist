@@ -21,11 +21,7 @@ export default function UserPage() {
 
   const filterCards = (content, search, numCards) => {
     return content
-      .filter((card) => {
-        const tlcTitle = card.title.toLowerCase();
-        const tlcSearch = search.toLowerCase();
-        return tlcTitle.includes(tlcSearch);
-      })
+      .filter((card) => card.title.toLowerCase().includes(search.toLowerCase()))
       .slice(0, numCards);
   };
 

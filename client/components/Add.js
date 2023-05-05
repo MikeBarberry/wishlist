@@ -10,7 +10,7 @@ export default function Add({ token }) {
   const handleSubmit = async () => {
     if (!validateAddedContent(add.title, add.description, add.image)) return;
     addContent({
-      jwt: token,
+      token,
       title: add.title,
       description: add.description,
       image: add.image,

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { WishlistContextProvider, Login, Register, Page } from '.';
 import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -24,6 +25,11 @@ const router = createBrowserRouter([
 ]);
 
 export default function Container() {
+  useEffect(() => {
+    import('darkreader').then((dr) =>
+      dr.enable({ brightness: 100, contrast: 90, sepia: 10 })
+    );
+  }, []);
   return (
     <WishlistContextProvider>
       <CssBaseline />
