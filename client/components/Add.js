@@ -8,12 +8,13 @@ export default function Add({ token }) {
     useWishlistDispatch();
 
   const handleSubmit = async () => {
-    if (!validateAddedContent(add.title, add.description, add.image)) return;
+    const { title, description, image } = add;
+    if (!validateAddedContent(title, description, image)) return;
     addContent({
       token,
-      title: add.title,
-      description: add.description,
-      image: add.image,
+      title,
+      description,
+      image,
     });
   };
   return (
