@@ -23,6 +23,10 @@ export default async function handleRegister({
       hash,
     });
     const newUserID = newUser.insertedId;
+    /**
+     * @description add new user to each of
+     * the default cards
+     */
     const defaultCards = await cardsCol.aggregate([
       {
         $match: {
